@@ -50,7 +50,7 @@ if answer == '1'
 
   saved_board_setup = saved_board[:board].map do |k, _v|
     piece = Object.const_get(k[:piece][:type]) unless k[:piece].nil?
-    saved_piece = k[:piece].nil? ? nil : piece.new(k[:piece][:color]) 
+    saved_piece = k[:piece].nil? ? nil : piece.new(k[:piece][:color])
     saved_board[:board][0][k] = Square.new(k[:location], saved_piece)
   end
 
@@ -91,7 +91,7 @@ loop do
 
     if start_location == 'save'
       SaveMechanics.preserve_turn(player1, player2)
-      
+
       if created_at < DateTime.parse(DateTime.now.strftime("%b %-d %Y %-l:%M %p"))
         SaveMechanics.update(
           id,
@@ -110,10 +110,14 @@ loop do
         ) || redo
       end
     else
-      start_location = start_location.split(',').flatten.map! do |num|
-        next if num.is_a?(Integer) 
+      start_location = start_location.split(',')
+      start_location.map.with_index do |num, i|
+        next if i.zero? && num.is_a?(String)
+        next if i == 1 && num.is_a?(Integer)
 
-        Integer(num)
+        start_location[0] = Integer(GameMechanics::CONVERSION[start_location[0].to_sym])
+        start_location[1] = Integer(start_location[1])
+        [start_location[1], start_location[0]]
       end
     end
   rescue ArgumentError
@@ -145,10 +149,14 @@ loop do
         ) || redo
       end
     else
-      end_location = end_location.split(',').flatten.map! do |num|
-        next if num.is_a?(Integer)
+      end_location = end_location.split(',')
+      end_location.map.with_index do |num, i|
+        next if i.zero? && num.is_a?(String)
+        next if i == 1 && num.is_a?(Integer)
 
-        Integer(num)
+        end_location[0] = Integer(GameMechanics::CONVERSION[end_location[0].to_sym])
+        end_location[1] = Integer(end_location[1])
+        [end_location[1], end_location[0]]
       end
     end
   rescue ArgumentError

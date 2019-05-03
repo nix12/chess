@@ -61,31 +61,31 @@ class SetupDisplay
   end
 
   def create_white_knights
-    gameboard.display[0][1] = white_knight.icon
-    gameboard.display[0][6] = white_knight.icon
+    gameboard.display[1][2] = white_knight.icon
+    gameboard.display[1][7] = white_knight.icon
   end
 
   def create_white_rooks
-    gameboard.display[0][0] = white_rook.icon
-    gameboard.display[0][7] = white_rook.icon
+    gameboard.display[1][1] = white_rook.icon
+    gameboard.display[1][8] = white_rook.icon
   end
 
   def create_white_bishops
-    gameboard.display[0][2] = white_bishop.icon
-    gameboard.display[0][5] = white_bishop.icon
+    gameboard.display[1][3] = white_bishop.icon
+    gameboard.display[1][6] = white_bishop.icon
   end
 
   def create_white_queen
-    gameboard.display[0][3] = white_queen.icon
+    gameboard.display[1][4] = white_queen.icon
   end
 
   def create_white_king
-    gameboard.display[0][4] = white_king.icon
+    gameboard.display[1][5] = white_king.icon
   end
 
   def create_white_pawns
     8.times do |space|
-      gameboard.display[1][space] = white_pawn.icon
+      gameboard.display[2][space + 1] = white_pawn.icon
     end
   end
 
@@ -101,31 +101,31 @@ class SetupDisplay
   end
 
   def create_black_knights
-    gameboard.display[7][1] = black_knight.icon
-    gameboard.display[7][6] = black_knight.icon
+    gameboard.display[8][2] = black_knight.icon
+    gameboard.display[8][7] = black_knight.icon
   end
 
   def create_black_rooks
-    gameboard.display[7][0] = black_rook.icon
-    gameboard.display[7][7] = black_rook.icon
+    gameboard.display[8][1] = black_rook.icon
+    gameboard.display[8][8] = black_rook.icon
   end
 
   def create_black_bishops
-    gameboard.display[7][2] = black_bishop.icon
-    gameboard.display[7][5] = black_bishop.icon
+    gameboard.display[8][3] = black_bishop.icon
+    gameboard.display[8][6] = black_bishop.icon
   end
 
   def create_black_queen
-    gameboard.display[7][3] = black_queen.icon
+    gameboard.display[8][4] = black_queen.icon
   end
 
   def create_black_king
-    gameboard.display[7][4] = black_king.icon
+    gameboard.display[8][5] = black_king.icon
   end
 
   def create_black_pawns
     8.times do |space|
-      gameboard.display[6][space] = black_pawn.icon
+      gameboard.display[7][space + 1] = black_pawn.icon
     end
   end
 end

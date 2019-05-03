@@ -60,31 +60,31 @@ class SetupBoard
   end
 
   def create_white_knights
-    gameboard.find([0, 1]).piece = white_knight
-    gameboard.find([0, 6]).piece = white_knight
+    gameboard.find([1, 2]).piece = white_knight
+    gameboard.find([1, 7]).piece = white_knight
   end
 
   def create_white_rooks
-    gameboard.find([0, 0]).piece = white_rook
-    gameboard.find([0, 7]).piece = white_rook
+    gameboard.find([1, 1]).piece = white_rook
+    gameboard.find([1, 8]).piece = white_rook
   end
 
   def create_white_bishops
-    gameboard.find([0, 2]).piece = white_bishop
-    gameboard.find([0, 5]).piece = white_bishop
+    gameboard.find([1, 3]).piece = white_bishop
+    gameboard.find([1, 6]).piece = white_bishop
   end
 
   def create_white_queen
-    gameboard.find([0, 3]).piece = white_queen
+    gameboard.find([1, 4]).piece = white_queen
   end
 
   def create_white_king
-    gameboard.find([0, 4]).piece = white_king
+    gameboard.find([1, 5]).piece = white_king
   end
 
   def create_white_pawns
     8.times do |space|
-      gameboard.find([1, space]).piece = white_pawn
+      gameboard.find([2, space + 1]).piece = white_pawn
     end
   end
 
@@ -100,31 +100,31 @@ class SetupBoard
   end
 
   def create_black_knights
-    gameboard.find([7, 1]).piece = black_knight
-    gameboard.find([7, 6]).piece = black_knight
+    gameboard.find([8, 2]).piece = black_knight
+    gameboard.find([8, 7]).piece = black_knight
   end
 
   def create_black_rooks
-    gameboard.find([7, 0]).piece = black_rook
-    gameboard.find([7, 7]).piece = black_rook
+    gameboard.find([8, 1]).piece = black_rook
+    gameboard.find([8, 8]).piece = black_rook
   end
 
   def create_black_bishops
-    gameboard.find([7, 2]).piece = black_bishop
-    gameboard.find([7, 5]).piece = black_bishop
+    gameboard.find([8, 3]).piece = black_bishop
+    gameboard.find([8, 6]).piece = black_bishop
   end
 
   def create_black_queen
-    gameboard.find([7, 3]).piece = black_queen
+    gameboard.find([8, 4]).piece = black_queen
   end
 
   def create_black_king
-    gameboard.find([7, 4]).piece = black_king
+    gameboard.find([8, 5]).piece = black_king
   end
 
   def create_black_pawns
     8.times do |space|
-      gameboard.find([6, space]).piece = black_pawn
+      gameboard.find([7, space + 1]).piece = black_pawn
     end
   end
 end

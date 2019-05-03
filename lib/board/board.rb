@@ -1,6 +1,5 @@
 require_relative 'square'
 require_relative '../base/base'
-require 'ostruct'
 
 # Handles initializing, building and displaying chess board.
 # Also, provides ability to find specifc spaces in the chess board.
@@ -13,11 +12,11 @@ class Board < Base
   end
 
   def self.x_coordinate
-    (0..7).to_a
+    (0..8).to_a
   end
 
   def self.y_coordinate
-    (0..7).to_a
+    (0..8).to_a
   end
 
   def find(value)
@@ -44,12 +43,22 @@ class Board < Base
   end
 
   def build_display
-    Board.x_coordinate.each.with_index do |_x, _i|
+    y_coord = [' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+    Board.x_coordinate.each.with_index do |_x, i|
       row = []
-      display << row
 
-      Board.y_coordinate.each.with_index do |_y, _j|
-        row << '*'
+      if i.zero?
+        display << [' ', '1', '2', '3', '4', '5', '6', '7', '8']
+      else
+        display << row
+      end
+
+      Board.y_coordinate.each.with_index do |_y, j|
+        if j.zero?
+          row << y_coord[i]
+        else
+          row << '*'
+        end
       end
     end
   end

@@ -1,5 +1,16 @@
 # Contains methods for general gameplay
 module GameMechanics
+  CONVERSION = {
+    a: 1,
+    b: 2,
+    c: 3,
+    d: 4,
+    e: 5,
+    f: 6,
+    g: 7,
+    h: 8
+  }
+
   def self.select_piece(board, start_location, end_location)
     start_piece = board.find(start_location).piece
     destination_piece = board.find(end_location).piece
