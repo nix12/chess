@@ -11,11 +11,9 @@ RSpec.describe SaveMechanics do
   let(:updated_at) { DateTime.now.strftime("%b %-d %Y %-l:%M %p") }
 
   CONN = PG.connect(
-    dbname: ENV['DB_TEST'],
-    user: ENV['USERNAME'],
-    password: ENV['DB_PASSWORD'],
+    dbname: 'chess_test',
     host: 'localhost',
-    port: 5433
+    port: 5432
   )
 
   before(:each) do

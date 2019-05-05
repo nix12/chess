@@ -1,5 +1,3 @@
-require 'dotenv/load'
-Dotenv.load('db/settings.env')
 require 'rubygems'
 require 'rspec/core'
 require 'spork'

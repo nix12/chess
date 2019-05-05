@@ -7,6 +7,3 @@ gem 'spork', github: 'sporkrb/spork', branch: 'master'
 
 # For persisting data
 gem 'pg'
-
-# Configuration
-gem 'dotenv'

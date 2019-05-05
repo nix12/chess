@@ -1,24 +1,28 @@
 require 'pg'
 require 'date'
+require 'singleton'
 
 # Method definition for saving chess games
-module SaveMechanics
-  ENV['RUBY_ENV'] == 'test' ? name = ENV['DB_TEST'] : name = ENV['DB_NAME']
-  
-  CONN = PG.connect(
-    dbname: name,
-    user: ENV['USERNAME'],
-    password: ENV['DB_PASSWORD'],
-    host: 'localhost',
-    port: 5433
-  )
+class SaveMechanics
+  include Singleton
 
-  def self.preserve_turn(player1, player2)
+  attr_accessor :conn
+
+  def initialize
+    setup_database unless system('psql -lqt | cut -d \| -f 1 | grep -qw chessdb')
+
+    name = ENV['RUBY_ENV'] == 'test' ? 'chess_test' : 'chessdb'
+    @conn = PG.connect(dbname: name)
+    surpress_notice
+    create_table
+  end
+
+  def preserve_turn(player1, player2)
     player1.active = !player1.active
     player2.active = !player2.active
   end
 
-  def self.from_json!(string)
+  def from_json!(string)
     JSON.parse(string).each do |var, val|
       if var.is_a?(Hash)
         var.each do |k, v|
@@ -30,11 +34,11 @@ module SaveMechanics
     end
   end
 
-  def self.recursive_formatting(hash)
+  def recursive_formatting(hash)
     my_hash = {}
 
     hash.each do |k, v|
-      my_hash[k.delete('@').to_sym] = if v.is_a?(Hash)
+      my_hash[convert_to_symbol(k)] = if v.is_a?(Hash)
         recursive_formatting(v)
       elsif v.is_a?(Array)
         v.each.with_index do |h, i|
@@ -48,8 +52,15 @@ module SaveMechanics
     my_hash
   end
 
-  def self.create_table
-    CONN.exec(
+  # Removes the @ from them instance variable to the symbol can be used.
+  # Otherwise, the instance variable will look like ':@symbol' and cannot
+  # be used with loading a saved game.
+  def convert_to_symbol(instance_variable)
+    instance_variable.delete('@').to_sym
+  end
+
+  def create_table
+    conn.exec(
       'CREATE TABLE IF NOT EXISTS chess(
         Id SERIAL PRIMARY KEY,
         Board TEXT,
@@ -61,12 +72,12 @@ module SaveMechanics
     )
   end
 
-  def self.surpress_notice
-    CONN.exec("SELECT set_config('client_min_messages', 'error', false)")
+  def surpress_notice
+    conn.exec("SELECT set_config('client_min_messages', 'error', false)")
   end
 
-  def self.number_of_saved_games
-    res = CONN.exec(
+  def number_of_saved_games
+    res = conn.exec(
       'SELECT COUNT(*)
       FROM chess'
     )
@@ -74,7 +85,31 @@ module SaveMechanics
     res[0]['count'].to_i
   end
 
-  def self.save(board, player1, player2, created_at, updated_at)
+  def check_if_posgresql_is_installed
+    if system('which psql')
+      puts 'Postgresql database found.'
+      true
+    else
+      puts 'Please install postgresql before running.'
+      exit(0)
+    end
+  end
+
+  def setup_database
+    if check_if_posgresql_is_installed
+      puts 'Creating database cluster.'
+      username = %x[whoami]
+      if system("createdb chessdb -O #{ username }")
+        puts'Cluster created.'
+      else
+        puts'Cluster creation failed.'
+      end
+    else
+      puts 'Could not find psql command.'
+    end
+  end
+
+  def save(board, player1, player2, created_at, updated_at)
     if number_of_saved_games >= 10
       puts 'You have exceeded the maximum number games of 10.'
       puts 'Would you like to delete a previously saved game'
@@ -93,7 +128,7 @@ module SaveMechanics
         puts "Game #{ id } has been deleted."
         puts 'Saving your game.'
 
-        CONN.exec_params(
+        conn.exec_params(
           'INSERT INTO chess (board, player1, player2, created_at, updated_at)
           VALUES ($1, $2, $3, $4, $5)',
           [board, player1, player2, created_at, updated_at]
@@ -101,7 +136,7 @@ module SaveMechanics
 
         puts 'Your game has been saved.'
 
-        SaveMechanics.disconnect if ENV['RUBY_ENV'] != 'test'
+        disconnect if ENV['RUBY_ENV'] != 'test'
         exit(0)
       else
         puts 'Unable to save game.'
@@ -110,7 +145,7 @@ module SaveMechanics
     else
       puts 'Saving your game.'
 
-      CONN.exec_params(
+      conn.exec_params(
         'INSERT INTO chess (board, player1, player2, created_at, updated_at)
         VALUES ($1, $2, $3, $4, $5)',
         [board, player1, player2, created_at, updated_at]
@@ -118,21 +153,21 @@ module SaveMechanics
 
       puts 'Your game has been saved.'
 
-      SaveMechanics.disconnect if ENV['RUBY_ENV'] != 'test'
+      disconnect if ENV['RUBY_ENV'] != 'test'
       exit(0)
     end
   end
 
-  def self.delete(id)
-    CONN.exec_params(
+  def delete(id)
+    conn.exec_params(
       'DELETE FROM chess
       WHERE id = $1',
       [id]
     )
   end
 
-  def self.load(id)
-    res = CONN.exec_params(
+  def load(id)
+    res = conn.exec_params(
       'SELECT *
       FROM chess
       WHERE id = $1',
@@ -144,8 +179,8 @@ module SaveMechanics
     end
   end
 
-  def self.update(id, board, player1, player2, updated_at)
-    CONN.exec_params(
+  def update(id, board, player1, player2, updated_at)
+    conn.exec_params(
       'UPDATE chess
       SET board = $2, player1 = $3, player2 = $4, updated_at = $5
       WHERE id = $1',
@@ -154,12 +189,12 @@ module SaveMechanics
 
     puts 'Your game has been saved.'
 
-    SaveMechanics.disconnect if ENV['RUBY_ENV'] != 'test'
+    disconnect if ENV['RUBY_ENV'] != 'test'
     exit(0)
   end
 
-  def self.list_games
-    res = CONN.exec(
+  def list_games
+    res = conn.exec(
       'SELECT *
       FROM chess
       ORDER BY Id ASC'
@@ -183,8 +218,8 @@ module SaveMechanics
     end
   end
 
-  def self.disconnect
+  def disconnect
     puts 'Exiting.'
-    CONN.close
+    conn.close
   end
 end
