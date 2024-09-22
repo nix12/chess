@@ -9,10 +9,17 @@ class SaveMechanics
   attr_accessor :conn
 
   def initialize
-    setup_database unless system('psql -lqt | cut -d \| -f 1 | grep -qw chessdb')
-
+    setup_database unless system('psql -lqt postgresql://postgres:postgres@localhost:5432 | cut -d \| -f 1 | grep -qw chessdb')
+    
     name = ENV['RUBY_ENV'] == 'test' ? 'chess_test' : 'chessdb'
-    @conn = PG.connect(dbname: name)
+    @conn = PG.connect(
+      dbname: name, 
+      user: "postgres", 
+      password: "postgres", 
+      port: 5432, 
+      host: "localhost"
+    )
+
     surpress_notice
     create_table
   end
@@ -98,8 +105,8 @@ class SaveMechanics
   def setup_database
     if check_if_posgresql_is_installed
       puts 'Creating database cluster.'
-      username = %x[whoami]
-      if system("createdb chessdb -O #{ username }")
+
+      if system('psql postgresql://postgres:postgres@localhost:5432 -c "CREATE DATABASE chessdb"')
         puts'Cluster created.'
       else
         puts'Cluster creation failed.'

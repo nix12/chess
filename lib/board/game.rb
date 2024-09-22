@@ -5,11 +5,11 @@ require_relative '../pieces/bishop'
 require_relative '../pieces/queen'
 require_relative '../pieces/king'
 require_relative '../pieces/pawn'
+require 'enumerator'
 
-# Handles "Setup" of the display and placement of the
-# chess pieces in the display.
-class SetupDisplay
-  attr_reader :gameboard,
+# Handles the "Setup" of chess board with chess pieces.
+class Game
+  attr_reader :interface,
               :white_knight,
               :black_knight,
               :white_rook,
@@ -23,8 +23,8 @@ class SetupDisplay
               :white_pawn,
               :black_pawn
 
-  def initialize(gameboard)
-    @gameboard = gameboard
+  def initialize(interface)
+    @interface = interface
 
     @white_knight = Knight.new('white')
     @white_rook = Rook.new('white')
@@ -41,12 +41,36 @@ class SetupDisplay
     @black_pawn = Pawn.new('black')
   end
 
-  # Setup display of the full chess board
+  # Set up full chess board
 
-  def setup_display
-    gameboard.build_display
+  def setup_board
+    interface.build_board
     build_white_side
     build_black_side
+  end
+
+  def compose_display
+    interface.board.map do |square|
+      if square.piece 
+        interface.display << square.piece.icon
+      else
+        interface.display << '*'
+      end
+    end
+      
+    assign_labels
+  end
+
+  def assign_labels
+    y_coord = ['1', '2', '3', '4', '5', '6', '7', '8']
+    interface.display = interface.display.each_slice(8).to_a
+
+    interface.display.map.with_index { |row, i| row.prepend(y_coord[i]) }
+    interface.display.prepend([' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'])
+  end
+
+  def print_display
+    interface.display.reverse_each { |row| p row.join(' ') }
   end
 
   # White pieces
@@ -61,35 +85,35 @@ class SetupDisplay
   end
 
   def create_white_knights
-    gameboard.display[1][2] = white_knight.icon
-    gameboard.display[1][7] = white_knight.icon
+    interface.find([1, 2]).piece = white_knight
+    interface.find([1, 7]).piece = white_knight
   end
 
   def create_white_rooks
-    gameboard.display[1][1] = white_rook.icon
-    gameboard.display[1][8] = white_rook.icon
+    interface.find([1, 1]).piece = white_rook
+    interface.find([1, 8]).piece = white_rook
   end
 
   def create_white_bishops
-    gameboard.display[1][3] = white_bishop.icon
-    gameboard.display[1][6] = white_bishop.icon
+    interface.find([1, 3]).piece = white_bishop
+    interface.find([1, 6]).piece = white_bishop
   end
 
   def create_white_queen
-    gameboard.display[1][4] = white_queen.icon
+    interface.find([1, 4]).piece = white_queen
   end
 
   def create_white_king
-    gameboard.display[1][5] = white_king.icon
+    interface.find([1, 5]).piece = white_king
   end
 
   def create_white_pawns
     8.times do |space|
-      gameboard.display[2][space + 1] = white_pawn.icon
+      interface.find([2, space + 1]).piece = white_pawn
     end
   end
 
-  # Black pieces
+  # Black peices
 
   def build_black_side
     create_black_knights
@@ -101,31 +125,31 @@ class SetupDisplay
   end
 
   def create_black_knights
-    gameboard.display[8][2] = black_knight.icon
-    gameboard.display[8][7] = black_knight.icon
+    interface.find([8, 2]).piece = black_knight
+    interface.find([8, 7]).piece = black_knight
   end
 
   def create_black_rooks
-    gameboard.display[8][1] = black_rook.icon
-    gameboard.display[8][8] = black_rook.icon
+    interface.find([8, 1]).piece = black_rook
+    interface.find([8, 8]).piece = black_rook
   end
 
   def create_black_bishops
-    gameboard.display[8][3] = black_bishop.icon
-    gameboard.display[8][6] = black_bishop.icon
+    interface.find([8, 3]).piece = black_bishop
+    interface.find([8, 6]).piece = black_bishop
   end
 
   def create_black_queen
-    gameboard.display[8][4] = black_queen.icon
+    interface.find([8, 4]).piece = black_queen
   end
 
   def create_black_king
-    gameboard.display[8][5] = black_king.icon
+    interface.find([8, 5]).piece = black_king
   end
 
   def create_black_pawns
     8.times do |space|
-      gameboard.display[7][space + 1] = black_pawn.icon
+      interface.find([7, space + 1]).piece = black_pawn
     end
   end
 end

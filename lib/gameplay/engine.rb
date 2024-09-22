@@ -1,6 +1,5 @@
 require_relative '../board/board'
-require_relative '../board/setup_board'
-require_relative '../board/setup_display'
+require_relative '../board/game'
 require_relative '../player/player'
 require_relative 'game_mechanics'
 require_relative 'save_mechanics'
@@ -11,6 +10,7 @@ class Engine
                 :save_mechanics,
                 :data,
                 :board,
+                :game,
                 :player1,
                 :player2,
                 :created_at,
@@ -67,6 +67,8 @@ class Engine
     puts '(1) To start a new game.'
     puts '(2) To load a previous game.'
     puts '(3) To exit game.'
+    puts
+    puts 'Enter option to continue:'
     answer = $stdin.gets.chomp
 
     begin
@@ -98,10 +100,10 @@ class Engine
 
     # Board and Display setup.
     @board = Board.new
-    game = SetupBoard.new(board)
+    @game = SetupBoard.new(board)
+
     game.setup_board
-    display = SetupDisplay.new(board)
-    display.setup_display
+    game.compose_display
 
     # Create new formatted date show when a new game was made.
     @created_at = DateTime.parse(DateTime.now.strftime("%b %-d %Y %-l:%M %p"))
@@ -114,18 +116,12 @@ class Engine
     load_date
   end
 
+  # Evaluate from the inside out
+  # Y coordinate must be found before the X coordinate
   def retrieve_location(location)
     location = location.split(',')
-    location.map.with_index do |num, i|
-      next if i.zero? && num.is_a?(String)
-      next if i == 1 && num.is_a?(Integer)
 
-      location[0] = Integer(game_mechanics.conversion[location[0].to_sym])
-      location[1] = Integer(location[1])
-      [location[1], location[0]]
-    end
-
-    location
+    [Integer(location[1]), Integer(game_mechanics.conversion[location[0].to_sym])]
   end
 
   def save_or_update_game
@@ -166,13 +162,16 @@ class Engine
   def play
     loop do
       enemy_king = game_mechanics.change_turn(board, player1, player2)
-      board.print_display
-      puts "#{Player.active_user_name}'s turn"
+      
+      game.print_display
 
+      puts "#{Player.active_user_name}'s turn"
       puts 'Select chess piece you would like to move'
+    
       start_location = move_piece
 
       puts 'Select location you would like to move to'
+    
       end_location = move_piece
 
       game_mechanics.reset_error(board, start_location)
@@ -197,7 +196,7 @@ class Engine
       my_king = game_mechanics.get_my_king(board, Player.active_user)
 
       loop do
-        board.print_display
+        game.print_display
 
         puts "#{Player.active_user_name}'s turn"
         puts 'Please move your king that is in check'

@@ -8,7 +8,6 @@ class Piece < Base
 
   def initialize(color)
     @color = color
-    @type = self.class
     @moves = []
     @error = false
     @count = 0
@@ -133,11 +132,11 @@ class Piece < Base
 
   def create_moves(start_location)
     move_set.each do |move|
-      if start_location[0] + move[0] >= 0 && start_location[0] + move[0] <= 7
+      if start_location[0] + move[0] >= 1 && start_location[0] + move[0] <= 8
         y = start_location[0] + move[0]
       end
 
-      if start_location[1] + move[1] >= 0 && start_location[1] + move[1] <= 7
+      if start_location[1] + move[1] >= 1 && start_location[1] + move[1] <= 8
         x = start_location[1] + move[1]
       end
 

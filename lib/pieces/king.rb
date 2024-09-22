@@ -82,7 +82,7 @@ class King < Piece
   end
 
   def upper_right(board, king_location)
-    (king_location[0]..7).each.with_index do |_range, i|
+    (king_location[1]..8).each.with_index do |_range, i|
       checkmate << [king_location[0] + i, king_location[1] + i] unless i.zero?
     end
 
@@ -90,7 +90,7 @@ class King < Piece
   end
 
   def upper_left(board, king_location)
-    (king_location[0]..7).reverse_each.with_index do |_range, i|
+    (king_location[1]..8).reverse_each.with_index do |_range, i|
       checkmate << [king_location[0] + i, king_location[1] - i] unless i.zero?
     end
 
@@ -106,7 +106,7 @@ class King < Piece
   end
 
   def bottom_left(board, king_location)
-    king_location[0].downto(0).reverse_each.with_index do |_range, i|
+    king_location[0].downto(1).reverse_each.with_index do |_range, i|
       checkmate << [king_location[0] - i, king_location[1] - i] unless i.zero?
     end
 
@@ -114,7 +114,7 @@ class King < Piece
   end
 
   def top(board, king_location)
-    (king_location[0]..7).each.with_index do |range, i|
+    (king_location[1]..8).each.with_index do |range, i|
       checkmate << [range, king_location[1]] unless i.zero?
     end
 
@@ -122,7 +122,7 @@ class King < Piece
   end
 
   def bottom(board, king_location)
-    king_location[0].downto(0).each.with_index do |range, i|
+    king_location[0].downto(1).each.with_index do |range, i|
       checkmate << [range, king_location[1]] unless i.zero?
     end
 
@@ -130,7 +130,7 @@ class King < Piece
   end
 
   def right(board, king_location)
-    (king_location[1]..7).each.with_index do |range, i|
+    (king_location[1]..8).each.with_index do |range, i|
       checkmate << [king_location[0], range] unless i.zero?
     end
 
@@ -138,7 +138,7 @@ class King < Piece
   end
 
   def left(board, king_location)
-    king_location[1].downto(0).each.with_index do |range, i|
+    king_location[1].downto(1).each.with_index do |range, i|
       checkmate << [king_location[0], range] unless i.zero?
     end
 
@@ -157,7 +157,7 @@ class King < Piece
 
   def valid_path
     checkmate.reject! do |location|
-      location if location[0] < 0 || location[0] > 7 || location[1] < 0 || location[1] > 7
+      location if location[0] <= 1 || location[0] >= 8 || location[1] <= 1 || location[1] >= 8
     end
   end
 

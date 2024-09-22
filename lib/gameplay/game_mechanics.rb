@@ -4,7 +4,7 @@ require 'singleton'
 class GameMechanics
   include Singleton
 
-  attr_accessor :conversion
+  attr_reader :conversion
 
   def initialize
     @conversion = {

@@ -12,11 +12,11 @@ class Board < Base
   end
 
   def self.x_coordinate
-    (0..8).to_a
+    (1..8).to_a
   end
 
   def self.y_coordinate
-    (0..8).to_a
+    (1..8).to_a
   end
 
   def find(value)
@@ -32,38 +32,8 @@ class Board < Base
   def build_board
     Board.x_coordinate.each do |x|
       Board.y_coordinate.each do |y|
-        node = Square.new([x, y])
-        board << node
+        board << Square.new([x, y])
       end
     end
-  end
-
-  def print_board
-    pp board
-  end
-
-  def build_display
-    y_coord = [' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
-    Board.x_coordinate.each.with_index do |_x, i|
-      row = []
-
-      if i.zero?
-        display << [' ', '1', '2', '3', '4', '5', '6', '7', '8']
-      else
-        display << row
-      end
-
-      Board.y_coordinate.each.with_index do |_y, j|
-        if j.zero?
-          row << y_coord[i]
-        else
-          row << '*'
-        end
-      end
-    end
-  end
-
-  def print_display
-    display.reverse_each { |row| p row.join(' ') }
   end
 end

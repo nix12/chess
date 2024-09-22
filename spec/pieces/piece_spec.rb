@@ -1,6 +1,5 @@
 require 'board/board'
-require 'board/setup_board'
-require 'board/setup_display'
+require 'board/game'
 require 'pieces/knight'
 require 'pieces/queen'
 require 'pieces/pawn'
@@ -8,8 +7,7 @@ require 'pieces/pawn'
 RSpec.describe Piece do
   describe 'creation and movements' do
     let(:board) { Board.new }
-    let(:game) { SetupBoard.new(board) }
-    let(:display) { SetupDisplay.new(board) }
+    let(:game) { Game.new(board) }
     let(:knight) { game.white_knight }
     let(:white_queen) { game.white_queen }
     let(:black_queen) { game.black_queen }
@@ -18,12 +16,12 @@ RSpec.describe Piece do
 
     before do
       game.setup_board
-      display.setup_display
+      game.compose_display
 
       8.times do |space|
-        white_pawn.remove_piece(board, [1, space], [2, space])
+        white_pawn.remove_piece(board, [2, space], [3, space])
         white_pawn.moves.clear
-        black_pawn.remove_piece(board, [6, space], [5, space])
+        black_pawn.remove_piece(board, [7, space], [6, space])
         black_pawn.moves.clear
       end
     end
@@ -39,15 +37,15 @@ RSpec.describe Piece do
     end
 
     describe '#add_piece' do
-      let(:start_location) { [0, 1] }
-      let(:end_location) { [2, 2] }
+      let(:start_location) { [1, 2] }
+      let(:end_location) { [3, 3] }
 
       context 'should create and validate moves' do
         it 'calls create_moves' do
           allow(knight).to receive(:create_moves).with(start_location)
-          knight.instance_variable_set(:@moves, [[1, 3], [1, nil], [nil, 3], [nil, nil], [2, 2], [2, 0], [nil, 2], [nil, 0]])
+          knight.instance_variable_set(:@moves, [[2, 4], [2, nil], [nil, 4], [nil, nil], [3, 3], [3, 1], [nil, 3], [nil, 1]])
           expect(knight.moves).to eq(
-            [[1, 3], [1, nil], [nil, 3], [nil, nil], [2, 2], [2, 0], [nil, 2], [nil, 0]]
+            [[2, 4], [2, nil], [nil, 4], [nil, nil], [3, 3], [3, 1], [nil, 3], [nil, 1]]
           )
         end
 
@@ -86,8 +84,8 @@ RSpec.describe Piece do
     end
 
     describe '#remove_piece' do
-      let(:start_location) { [0, 1] }
-      let(:end_location) { [2, 2] }
+      let(:start_location) { [1, 2] }
+      let(:end_location) { [3, 3] }
 
       context 'should create and validate moves' do
         it 'calls create_moves' do
@@ -129,8 +127,8 @@ RSpec.describe Piece do
     end
 
     describe '#replace_piece' do
-      let(:start_location) { [0, 1] }
-      let(:end_location) { [2, 2] }
+      let(:start_location) { [1, 2] }
+      let(:end_location) { [3, 3] }
 
       context 'should create and validate moves' do
         it 'calls create_moves' do
@@ -178,8 +176,8 @@ RSpec.describe Piece do
     end
 
     describe '#move' do
-      let(:start_location) { [0, 3] }
-      let(:end_location) { [1, 2] }
+      let(:start_location) { [1, 4] }
+      let(:end_location) { [2, 3] }
 
       it 'calls add_piece' do
         allow(white_queen).to receive(:add_piece).with(board, start_location, end_location)
@@ -192,8 +190,8 @@ RSpec.describe Piece do
       end
 
       context 'diagonally' do
-        let(:start_location) { [0, 3] }
-        let(:end_location) { [3, 0] }
+        let(:start_location) { [1, 4] }
+        let(:end_location) { [4, 1] }
 
         it 'calls ranged_diagonal' do
           allow(white_queen).to receive(:ranged_diagonal)
@@ -230,8 +228,8 @@ RSpec.describe Piece do
       end
 
       context 'vertically' do
-        let(:start_location) { [0, 3] }
-        let(:end_location) { [5, 3] }
+        let(:start_location) { [1, 4] }
+        let(:end_location) { [6, 4] }
   
         it 'calls ranged_vertical' do
           allow(white_queen).to receive(:ranged_vertical)
@@ -252,13 +250,13 @@ RSpec.describe Piece do
       end
   
       context 'horizontally' do
-        let(:start_location) { [0, 3] }
-        let(:end_location) { [0, 7] }
+        let(:start_location) { [1, 4] }
+        let(:end_location) { [1, 8] }
   
         before do
-          (0..7).each.with_index do |space, i|
-            board.find([0, space]).piece = nil unless i == 3
-            board.display[0][space] = '*' unless i == 3
+          (1..8).each.with_index do |space, i|
+            board.find([1, space]).piece = nil unless i == 4
+            board.display[0][space] = '*' unless i == 4
           end
         end
   
@@ -281,8 +279,8 @@ RSpec.describe Piece do
       end
 
       context 'pawn movment' do
-        let(:start_location) { [1, 0] }
-        let(:end_location) { [3, 0] }
+        let(:start_location) { [2, 1] }
+        let(:end_location) { [4, 1] }
         
         before(:each) do
           game.create_white_pawns
@@ -306,8 +304,8 @@ RSpec.describe Piece do
     end
 
     describe '#take_piece' do
-      let(:start_location) { [0, 3] }
-      let(:end_location) { [1, 2] }
+      let(:start_location) { [1, 4] }
+      let(:end_location) { [2, 3] }
 
       it 'calls add_piece' do
         allow(white_queen).to receive(:add_piece).with(board, start_location, end_location)
@@ -321,13 +319,13 @@ RSpec.describe Piece do
 
       context 'diagonally' do
         it 'calls ranged_diagonal' do
-          start_location = [0, 3]
-          end_location = [3, 0]
+          start_location = [1, 4]
+          end_location = [4, 1]
 
           8.times do |space|
+            black_pawn.move(board, [7, space], [6, space])
             black_pawn.move(board, [6, space], [5, space])
             black_pawn.move(board, [5, space], [4, space])
-            black_pawn.move(board, [4, space], [3, space])
           end
 
           allow(white_queen).to receive(:ranged_diagonal)
@@ -348,11 +346,11 @@ RSpec.describe Piece do
 
         it 'should take a piece diagonally on board' do
           8.times do |space|
+            black_pawn.move(board, [7, space], [6, space])
             black_pawn.move(board, [6, space], [5, space])
             black_pawn.move(board, [5, space], [4, space])
             black_pawn.move(board, [4, space], [3, space])
             black_pawn.move(board, [3, space], [2, space])
-            black_pawn.move(board, [2, space], [1, space])
           end
 
           expect(board.find(start_location).piece).to eq(white_queen)
@@ -364,11 +362,11 @@ RSpec.describe Piece do
 
         it 'should take a piece diagonally in display' do
           8.times do |space|
+            black_pawn.move(board, [7, space], [6, space])
             black_pawn.move(board, [6, space], [5, space])
             black_pawn.move(board, [5, space], [4, space])
             black_pawn.move(board, [4, space], [3, space])
             black_pawn.move(board, [3, space], [2, space])
-            black_pawn.move(board, [2, space], [1, space])
           end
 
           expect(board.display[start_location[0]][start_location[1]]).to eq(white_queen.icon)
@@ -380,13 +378,13 @@ RSpec.describe Piece do
       end
 
       context 'vertically' do
-        let(:start_location) { [0, 3] }
-        let(:end_location) { [5, 3] }
+        let(:start_location) { [1, 4] }
+        let(:end_location) { [6, 4] }
 
         
         it 'calls ranged_vertical' do
           8.times do |space|
-            black_pawn.move(board, [6, space], [5, space])
+            black_pawn.move(board, [7, space], [6, space])
           end
 
           allow(white_queen).to receive(:ranged_vertical)
@@ -407,13 +405,13 @@ RSpec.describe Piece do
       end
   
       context 'horizontally' do
-        let(:start_location) { [0, 3] }
-        let(:end_location) { [0, 7] }
+        let(:start_location) { [1, 4] }
+        let(:end_location) { [1, 8] }
   
         before do
-          (0..7).each.with_index do |space, i|
-            board.find([0, space]).piece = nil unless i == 3
-            board.display[0][space] = '*' unless i == 3
+          (1..8).each.with_index do |space, i|
+            board.find([1, space]).piece = nil unless i == 4
+            board.display[0][space] = '*' unless i == 4
           end
         end
   
@@ -436,17 +434,17 @@ RSpec.describe Piece do
       end
 
       context 'pawn movement' do
-        let(:start_location) { [1, 0] }
-        let(:end_location) { [2, 1] }
+        let(:start_location) { [2, 1] }
+        let(:end_location) { [3, 2] }
 
         before(:each) do
           game.create_white_pawns
 
           8.times do |space|
+            black_pawn.move(board, [7, space], [6, space])
             black_pawn.move(board, [6, space], [5, space])
             black_pawn.move(board, [5, space], [4, space])
             black_pawn.move(board, [4, space], [3, space])
-            black_pawn.move(board, [3, space], [2, space])
           end
         end
 
@@ -469,8 +467,8 @@ RSpec.describe Piece do
 
     describe '#ranged_diagonal' do
       context '[x, y]' do
-        let(:start_location) { [0, 3] }
-        let(:end_location) { [4, 7] }
+        let(:start_location) { [1, 4] }
+        let(:end_location) { [5, 8] }
 
         it 'should move a piece diagonally on board' do
           expect(board.find(start_location).piece).to eq(white_queen)
@@ -490,8 +488,8 @@ RSpec.describe Piece do
       end
 
       context '[-x, y]' do
-        let(:start_location) { [0, 3] }
-        let(:end_location) { [3, 0] }
+        let(:start_location) { [1, 4] }
+        let(:end_location) { [4, 1] }
 
         it 'should move a piece diagonally on board' do
           expect(board.find(start_location).piece).to eq(white_queen)
@@ -511,8 +509,8 @@ RSpec.describe Piece do
       end
 
       context '[-x, -y]' do
-        let(:start_location) { [7, 3] }
-        let(:end_location) { [3, 7] }
+        let(:start_location) { [8, 4] }
+        let(:end_location) { [4, 8] }
 
         it 'should move a piece diagonally on board' do
           expect(board.find(start_location).piece).to eq(black_queen)
@@ -532,8 +530,8 @@ RSpec.describe Piece do
       end
 
       context '[-x, -y]' do
-        let(:start_location) { [7, 3] }
-        let(:end_location) { [4, 0] }
+        let(:start_location) { [8, 4] }
+        let(:end_location) { [5, 1] }
 
         it 'should move a piece diagonally on board' do
           expect(board.find(start_location).piece).to eq(black_queen)
@@ -556,14 +554,14 @@ RSpec.describe Piece do
         allow(white_queen).to receive(:check_if_occupied?)
           .with(board)
           .and_return(false)
-        white_queen.ranged_diagonal(board, [0, 3], [3, 0])
+        white_queen.ranged_diagonal(board, [1, 4], [4, 1])
       end
     end
 
     describe '#ranged_vertical' do
       context 'positive y-axis' do
-        let(:start_location) { [0, 3] }
-        let(:end_location) { [5, 3] }
+        let(:start_location) { [1, 4] }
+        let(:end_location) { [6, 4] }
 
         it 'should move a piece vertically on board' do
           expect(board.find(start_location).piece).to eq(white_queen)
@@ -583,8 +581,8 @@ RSpec.describe Piece do
       end
 
       context 'negative y-axis' do
-        let(:start_location) { [7, 3] }
-        let(:end_location) { [2, 3] }
+        let(:start_location) { [8, 4] }
+        let(:end_location) { [3, 4] }
 
         it 'should move a piece vertically on board' do
           expect(board.find(start_location).piece).to eq(black_queen)
@@ -607,24 +605,24 @@ RSpec.describe Piece do
         allow(white_queen).to receive(:check_if_occupied?)
           .with(board)
           .and_return(false)
-        white_queen.ranged_vertical(board, [0, 3], [5, 3])
+        white_queen.ranged_vertical(board, [1, 4], [6, 4])
       end
     end
 
     describe '#ranged_horizontal' do
       before do
-        (0..7).each.with_index do |space, i|
-          board.find([0, space]).piece = nil unless i == 3
-          board.display[0][space] = '*' unless i == 3
+        (1..8).each.with_index do |space, i|
+          board.find([1, space]).piece = nil unless i == 3
+          board.display[1][space] = '*' unless i == 3
 
-          board.find([7, space]).piece = nil unless i == 3
-          board.display[7][space] = '*' unless i == 3
+          board.find([8, space]).piece = nil unless i == 3
+          board.display[6][space] = '*' unless i == 3
         end
       end
 
       context 'positive x-axis' do
-        let(:start_location) { [0, 3] }
-        let(:end_location) { [0, 7] }
+        let(:start_location) { [1, 4] }
+        let(:end_location) { [1, 8] }
 
         it 'should move a piece horizontally on board' do
           expect(board.find(start_location).piece).to eq(white_queen)
@@ -644,8 +642,8 @@ RSpec.describe Piece do
       end
 
       context 'negative x-axis' do
-        let(:start_location) { [0, 3] }
-        let(:end_location) { [0, 0] }
+        let(:start_location) { [1, 4] }
+        let(:end_location) { [1, 1] }
 
         it 'should move a piece horizontally on board' do
           expect(board.find(start_location).piece).to eq(white_queen)
@@ -668,14 +666,14 @@ RSpec.describe Piece do
         allow(white_queen).to receive(:check_if_occupied?)
           .with(board)
           .and_return(false)
-        white_queen.ranged_horizontal(board, [0, 3], [0, 7])
+        white_queen.ranged_horizontal(board, [1, 4], [1, 8])
       end
     end
 
     describe '#check_if_occupied?' do
-      occupied_moves = [[0, 0], [0, 1], [0, 2], [0, 3]]
-      unoccupied_moves = [[3, 0], [3, 1], [3, 2], [3, 3]]
-      let(:space_double) { instance_double(Space) }
+      occupied_moves = [[1, 1], [1, 2], [1, 3], [1, 4]]
+      unoccupied_moves = [[4, 1], [4, 2], [4, 3], [4, 4]]
+      let(:space_double) { instance_double(Square) }
 
       unoccupied_moves.each do |move|
         it 'calls boards find method' do
