@@ -26,7 +26,7 @@ class Engine
       [save_mechanics.convert_to_symbol(k), v]
     end]
 
-    @player1 = Player.new(
+    @player1 = Player.new(      
       saved_player1[:name],
       saved_player1[:color],
       saved_player1[:active],
@@ -57,6 +57,7 @@ class Engine
     end
 
     @board = Board.new(saved_board_setup, saved_board[:display])
+    @game = Game.new(board)
   end
 
   def load_date
@@ -100,7 +101,7 @@ class Engine
 
     # Board and Display setup.
     @board = Board.new
-    @game = SetupBoard.new(board)
+    @game = Game.new(board)
 
     game.setup_board
     game.compose_display

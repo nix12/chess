@@ -8,6 +8,7 @@ class Piece < Base
 
   def initialize(color)
     @color = color
+    @type = self.class
     @moves = []
     @error = false
     @count = 0

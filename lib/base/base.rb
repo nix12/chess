@@ -1,3 +1,5 @@
+require 'json'
+
 class Base
   def to_json(options = {})
     hash = {}
